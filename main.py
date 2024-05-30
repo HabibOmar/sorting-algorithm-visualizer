@@ -60,7 +60,7 @@ def draw(draw_info, algo_name, ascending):
     draw_info.window.blit(controls, (draw_info.width / 2 - controls.get_width() / 2, 45))
 
     sorting = draw_info.FONT.render(
-        "I - Insertion Sort | B - Bubble Sort", 1, draw_info.DENIM
+        "I - Insertion Sort | B - Bubble Sort | G - Bogo Sort", 1, draw_info.DENIM
     )
     draw_info.window.blit(sorting, (draw_info.width / 2 - sorting.get_width() / 2, 75))
 
@@ -142,6 +142,32 @@ def insertion_sort(draw_info, ascending=True):
     return lst
 
 
+def bogo_sort(draw_info, ascending=True):
+    lst = draw_info.lst
+
+    def is_sorted():
+        nonlocal lst
+        if ascending:
+            for j in range(len(lst) - 1):
+                if lst[j] > lst[j + 1]:
+                    return False
+            return True
+
+        if not ascending:
+            for j in range(len(lst) - 1):
+                if lst[j] < lst[j + 1]:
+                    return False
+            return True
+
+    while not is_sorted():
+        for i in range(len(lst)):
+            r = random.randint(0, len(lst) - 1)
+            lst[i], lst[r] = lst[r], lst[i]
+            draw_list(draw_info, {i: draw_info.RED, r: draw_info.GREEN}, True)
+            yield True
+    return lst
+
+
 def main():
     """Main function to run the program. Many parameters can be changed here:
     list related n: number of elements, min_val: min value in list, max_val: max value in list
@@ -150,14 +176,14 @@ def main():
     clock = pygame.time.Clock()
 
     # List Parameters
-    n = 50
+    n = 5
     min_val = 0
     max_val = 100
 
     # Pygame window parameters
     window_width = 800
     window_height = 600
-    FPS = 60
+    FPS = 120
 
     lst = generate_starting_list(n, min_val, max_val)
     draw_info = DrawInformation(window_width, window_height, lst)
@@ -205,6 +231,9 @@ def main():
             elif event.key == pygame.K_i and not sorting:
                 sorting_algorithm = insertion_sort
                 sorting_algo_name = "Insertion Sort"
+            elif event.key == pygame.K_g and not sorting:
+                sorting_algorithm = bogo_sort
+                sorting_algo_name = "Bogo Sort"
 
     pygame.quit()
 
