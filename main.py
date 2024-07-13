@@ -4,7 +4,6 @@ import math
 
 pygame.init()
 
-
 class DrawInformation:
     """Class that manages all drawing related parameters. Colors, Fonts, Paddings etc."""
     # RGB colors used
@@ -168,6 +167,22 @@ def bogo_sort(draw_info, ascending=True):
     return lst
 
 
+def draw_menu(window, font, options, selected_idx):
+    window.fill(DrawInformation.BABY_PINK)
+
+    heading = font.render("Sorting Algorithm Visualizer", 1, DrawInformation.RASPBERRY)
+    window.blit(heading, (window.get_width() / 2 - heading.get_width() / 2, 20))
+    title = font.render("Choose the number of elements:", 1, DrawInformation.RASPBERRY)
+    window.blit(title, (window.get_width() / 2 - title.get_width() / 2, 90))
+
+    for idx, option in enumerate(options):
+        color = DrawInformation.DENIM if idx != selected_idx else DrawInformation.RASPBERRY
+        label = font.render(option, 1, color)
+        window.blit(label, (window.get_width() / 2 - label.get_width() / 2, 150 + idx * 40))
+
+    pygame.display.update()
+
+
 def main():
     """Main function to run the program. Many parameters can be changed here:
     list related n: number of elements, min_val: min value in list, max_val: max value in list
@@ -175,15 +190,35 @@ def main():
     run = True
     clock = pygame.time.Clock()
 
-    # List Parameters
-    n = 5
-    min_val = 0
-    max_val = 100
-
     # Pygame window parameters
     window_width = 800
     window_height = 600
-    FPS = 120
+    FPS = 60
+
+    window = pygame.display.set_mode((window_width, window_height))
+    font = pygame.font.SysFont('comicsans', 30)
+
+    options = ["5", "10", "20", "40", "50", "80", "100"]
+    selected_idx = 0
+    choosing = True
+
+    while choosing:
+        draw_menu(window, font, options, selected_idx)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP and selected_idx > 0:
+                    selected_idx -= 1
+                elif event.key == pygame.K_DOWN and selected_idx < len(options) - 1:
+                    selected_idx += 1
+                elif event.key == pygame.K_RETURN:
+                    n = int(options[selected_idx])
+                    choosing = False
+
+    min_val = 0
+    max_val = 100
 
     lst = generate_starting_list(n, min_val, max_val)
     draw_info = DrawInformation(window_width, window_height, lst)
@@ -236,7 +271,6 @@ def main():
                 sorting_algo_name = "Bogo Sort"
 
     pygame.quit()
-
 
 if __name__ == "__main__":
     main()
